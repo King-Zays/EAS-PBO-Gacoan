@@ -1,0 +1,19 @@
+# Compilation outputs
+bin/
+*.class
+
+# Windows Dynamic Libraries and Executables
+*.dll
+*.exe
+
+# Auto-generated JNI Header files (recreated on compile)
+gacoan_GacoanEngine.h
+gacoan_SistemNotifikasi.h
+
+# IDE and OS files
+.idea/
+.project
+.classpath
+.settings/
+.DS_Store
+Thumbs.db
