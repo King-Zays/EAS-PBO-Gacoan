@@ -17,3 +17,23 @@ gacoan_SistemNotifikasi.h
 .settings/
 .DS_Store
 Thumbs.db
+
+# --- Java Compiled Outputs ---
+*.class
+bin/
+out/
+
+# --- Temporary/Draft Markdown files ---
+gemini-code-1780423426497.md
+revisi.md
+
+# --- Script Refactor & Temporary Logs ---
+refactor.py
+refactor2.py
+refactor3.py
+refactor4.py
+image.png
+
+# --- OS & IDE Metadata ---
+.DS_Store
+Thumbs.db
