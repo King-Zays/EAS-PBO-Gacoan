@@ -4,7 +4,7 @@ public class Menu {
     private String id;
     private String nama;
     private double hargaDasar;
-    private String kategori; // Makanan, Dimsum, Minuman
+    private String kategori;
 
     public Menu(String id, String nama, double hargaDasar, String kategori) {
         this.id = id;

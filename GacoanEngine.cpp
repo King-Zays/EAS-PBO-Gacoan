@@ -1,5 +1,6 @@
 #define INITGUID
 #include <windows.h>
+#include <mmsystem.h>
 #include <sapi.h>
 #include <iostream>
 #include <string>
@@ -8,7 +9,6 @@
 #include "gacoan_GacoanEngine.h"
 #include "gacoan_SistemNotifikasi.h"
 
-// Helper to format currency to Rupiah (e.g., Rp 11.000)
 std::string formatRupiah(double amount) {
     long long val = (long long)amount;
     std::string s = std::to_string(val);
@@ -20,7 +20,6 @@ std::string formatRupiah(double amount) {
     return "Rp " + s;
 }
 
-// Convert jstring to std::string
 std::string jstringToString(JNIEnv* env, jstring jstr) {
     if (!jstr) return "";
     const char* strChars = env->GetStringUTFChars(jstr, NULL);
@@ -29,21 +28,17 @@ std::string jstringToString(JNIEnv* env, jstring jstr) {
     return result;
 }
 
-// JNI Implementation for hitungNota
 JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobject obj, jobject transaksiObj) {
     if (!transaksiObj) {
         return env->NewStringUTF("Error: Transaksi null");
     }
 
-    // 1. Get classes
     jclass transClass = env->GetObjectClass(transaksiObj);
     
-    // 2. Get method IDs
     jmethodID getIdNotaMid = env->GetMethodID(transClass, "getIdNota", "()Ljava/lang/String;");
     jmethodID getNomorMejaMid = env->GetMethodID(transClass, "getNomorMeja", "()I");
     jmethodID getDaftarBelanjaMid = env->GetMethodID(transClass, "getDaftarBelanja", "()Ljava/util/List;");
     
-    // 3. Retrieve fields
     jstring idNotaJStr = (jstring)env->CallObjectMethod(transaksiObj, getIdNotaMid);
     std::string idNota = jstringToString(env, idNotaJStr);
     
@@ -54,7 +49,6 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
         return env->NewStringUTF("Error: Daftar belanja null");
     }
 
-    // 4. Retrieve List items
     jclass listClass = env->GetObjectClass(listObj);
     jmethodID sizeMid = env->GetMethodID(listClass, "size", "()I");
     jmethodID getMid = env->GetMethodID(listClass, "get", "(I)Ljava/lang/Object;");
@@ -96,16 +90,14 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
         jstring katJStr = (jstring)env->CallObjectMethod(menuObj, getMenuKategoriMid);
         std::string kategori = jstringToString(env, katJStr);
 
-        // Apply Mie Gacoan pricing business logic
         double calculatedPrice = hargaDasar;
         if (kategori == "Makanan") {
-            // Mie Hompimpa or Mie Gacoan
             if (lvl >= 1 && lvl <= 4) {
                 calculatedPrice = 11000;
             } else if (lvl >= 5 && lvl <= 8) {
                 calculatedPrice = 13000;
             } else if (lvl == 0) {
-                calculatedPrice = 11000; // Original
+                calculatedPrice = 11000;
             }
         } else if (kategori == "Dimsum") {
             calculatedPrice = 10000;
@@ -116,7 +108,6 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
         double itemSubtotal = qty * calculatedPrice;
         subtotal += itemSubtotal;
 
-        // Print item details
         itemDetails << " " << nama;
         if (kategori == "Makanan") {
             itemDetails << " (Lvl " << lvl << ")";
@@ -129,7 +120,6 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
         }
         itemDetails << "\n";
 
-        // Clean local references in loop to prevent memory exhaustion
         env->DeleteLocalRef(namaJStr);
         env->DeleteLocalRef(katJStr);
         env->DeleteLocalRef(menuClass);
@@ -139,7 +129,7 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
         env->DeleteLocalRef(itemObj);
     }
 
-    double pb1 = subtotal * 0.10; // Tax 10%
+    double pb1 = subtotal * 0.10;
     double totalAkhir = subtotal + pb1;
 
     std::stringstream receipt;
@@ -162,7 +152,6 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
     receipt << "  Silakan monitor KDS dapur untuk pengambilan.  \n";
     receipt << "================================================\n";
 
-    // Clean class references
     env->DeleteLocalRef(listClass);
     env->DeleteLocalRef(listObj);
     env->DeleteLocalRef(transClass);
@@ -171,8 +160,14 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
     return env->NewStringUTF(receipt.str().c_str());
 }
 
-// JNI Implementation for panggilAntrean (TTS)
 JNIEXPORT void JNICALL Java_gacoan_SistemNotifikasi_panggilAntrean(JNIEnv *env, jclass clazz, jint nomorMeja) {
+    std::wstring wavPath = L"audio/meja_" + std::to_wstring(nomorMeja) + L".wav";
+    DWORD attrib = GetFileAttributesW(wavPath.c_str());
+    if (attrib != INVALID_FILE_ATTRIBUTES && !(attrib & FILE_ATTRIBUTE_DIRECTORY)) {
+        PlaySoundW(wavPath.c_str(), NULL, SND_FILENAME | SND_SYNC);
+        return;
+    }
+
     ISpVoice * pVoice = NULL;
 
     if (FAILED(::CoInitialize(NULL))) {
@@ -182,7 +177,6 @@ JNIEXPORT void JNICALL Java_gacoan_SistemNotifikasi_panggilAntrean(JNIEnv *env, 
 
     HRESULT hr = CoCreateInstance(CLSID_SpVoice, NULL, CLSCTX_ALL, IID_ISpVoice, (void **)&pVoice);
     if (SUCCEEDED(hr)) {
-        // Construct the audio announcement in Indonesian language
         std::wstring text = L"Pesanan untuk meja nomor " + std::to_wstring(nomorMeja) + L", silakan ambil.";
         
         pVoice->Speak(text.c_str(), 0, NULL);

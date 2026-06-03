@@ -31,7 +31,7 @@ echo [✓] Java classes compiled successfully.
 
 REM 4. Compile C++ GacoanEngine.dll
 echo [*] [2/3] Compiling C++ JNI Dynamic Library (GacoanEngine.dll)...
-g++ -shared -O2 -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -I. GacoanEngine.cpp -o bin/GacoanEngine.dll -lole32 -loleaut32 -luuid
+g++ -shared -O2 -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -I. GacoanEngine.cpp -o bin/GacoanEngine.dll -lole32 -loleaut32 -luuid -lwinmm
 if %ERRORLEVEL% neq 0 (
     echo [X] ERROR: C++ Compilation failed!
     pause

@@ -18,72 +18,59 @@ import java.util.Random;
 
 public class GacoanApp extends JFrame {
 
-    // Color Palette - Sleek Modern Dark Mode (Gacoan Premium Theme)
-    private static final Color COLOR_BG = new Color(18, 18, 24);        // Dark Charcoal
-    private static final Color COLOR_CARD = new Color(28, 28, 38);      // Sleek Grey
-    private static final Color COLOR_CARD_LIGHT = new Color(40, 40, 52); // Accent Card
-    private static final Color COLOR_ACCENT = new Color(241, 90, 36);    // Neon Gacoan Orange
+    private static final Color COLOR_BG = new Color(18, 18, 24);
+    private static final Color COLOR_CARD = new Color(28, 28, 38);
+    private static final Color COLOR_CARD_LIGHT = new Color(40, 40, 52);
+    private static final Color COLOR_ACCENT = new Color(241, 90, 36);
     private static final Color COLOR_ACCENT_HOVER = new Color(255, 115, 60);
     private static final Color COLOR_TEXT_PRIMARY = new Color(255, 255, 255);
     private static final Color COLOR_TEXT_MUTED = new Color(150, 150, 165);
-    private static final Color COLOR_GREEN = new Color(34, 197, 94);     // Success Emerald
-    private static final Color COLOR_CYAN = new Color(6, 182, 212);      // Dimsum Accent
-    private static final Color COLOR_PURPLE = new Color(168, 85, 247);   // Minuman Accent
+    private static final Color COLOR_GREEN = new Color(34, 197, 94);
+    private static final Color COLOR_CYAN = new Color(6, 182, 212);
+    private static final Color COLOR_PURPLE = new Color(168, 85, 247);
     private static final Color COLOR_BORDER = new Color(48, 48, 62);
 
-    // Business Variables
     private int nomorMejaLocked = 0;
     private final List<Menu> daftarMenu = new ArrayList<>();
     private final List<ItemPesanan> keranjangBelanja = new ArrayList<>();
     private final List<TransaksiPesanan> antreanDapur = new ArrayList<>();
     private final List<TransaksiPesanan> riwayatPanggilan = new ArrayList<>();
 
-    // JNI Calculation Engine
     private final GacoanEngine billingEngine = new GacoanEngine();
 
-    // UI Navigation Components
     private CardLayout mainCardLayout;
     private JPanel mainCardPanel;
     private JTabbedPane appTabbedPane;
 
-    // Cart UI elements
     private DefaultTableModel modelTabelKeranjang;
     private JTable tableKeranjang;
     private JLabel lblSubtotal;
     private JLabel lblTax;
     private JLabel lblTotal;
     
-    // Grid list reference for re-rendering on category filtering
     private JPanel panelGridMenu;
     private String currentCategoryFilter = "Semua";
 
-    // Diagnostic/QR elements
     private JLabel lblTableStatus;
     private ModernButton btnScanQr;
 
-    // KDS Queue Lists
     private JPanel panelKdsActiveQueue;
     private JPanel panelKdsHistoryQueue;
 
     public GacoanApp() {
-        // Initialize iconic menus
         initIconicMenus();
 
-        // Window properties
         setTitle("MIE GACOAN - Self Ordering Kiosk & Kitchen Display System");
         setSize(1240, 820);
         setMinimumSize(new Dimension(1024, 768));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Core Layout - Multi Screen
         mainCardLayout = new CardLayout();
         mainCardPanel = new JPanel(mainCardLayout);
         mainCardPanel.setBackground(UITheme.COLOR_BG_APP);
 
-        // 1. Screen 1: Diagnostic Pre-Flight Checker Screen
         JPanel panelPreFlight = buildPreFlightScreen();
-        // 2. Screen 2: Main Application Screen
         JPanel panelMainApp = buildMainAppScreen();
 
         mainCardPanel.add(panelPreFlight, "PRE_FLIGHT");
@@ -102,11 +89,6 @@ public class GacoanApp extends JFrame {
         daftarMenu.add(new Menu("ES_TEKLEK", "Es Teklek", 9000, "Minuman"));
     }
 
-    // =========================================================================
-    // GRAPHICAL CUSTOM SWING COMPONENT CLASSES
-    // =========================================================================
-
-    // 1. Premium Rounded Card Panel
     static class ModernCard extends JPanel {
         private int radius;
         private Color bgColor;
@@ -153,7 +135,6 @@ public class GacoanApp extends JFrame {
         }
     }
 
-    // 2. High-Performance Custom Button with Animations
     static class ModernButton extends JButton {
         private Color normalBg;
         private Color hoverBg;
@@ -175,7 +156,6 @@ public class GacoanApp extends JFrame {
             setFont(new Font("Segoe UI", Font.BOLD, 12));
             setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-            // Visual feedback on hover/click
             addMouseListener(new MouseAdapter() {
                 private boolean hover = false;
                 @Override
@@ -214,12 +194,10 @@ public class GacoanApp extends JFrame {
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), pillRadius, pillRadius);
             g2.dispose();
 
-            // Render labels
             super.paintComponent(g);
         }
     }
 
-    // 3. Flat Custom Text Field
     static class ModernTextField extends JTextField {
         public ModernTextField(String placeholder) {
             setBackground(COLOR_CARD_LIGHT);
@@ -231,7 +209,6 @@ public class GacoanApp extends JFrame {
                     BorderFactory.createEmptyBorder(6, 12, 6, 12)
             ));
             
-            // Set text hint / placeholder
             setText(placeholder);
             setForeground(COLOR_TEXT_MUTED);
             addFocusListener(new java.awt.event.FocusAdapter() {
@@ -253,7 +230,6 @@ public class GacoanApp extends JFrame {
         }
     }
 
-    // 4. Flat Custom JComboBox
     static class ModernComboBox<E> extends JComboBox<E> {
         public ModernComboBox() {
             setBackground(UITheme.COLOR_BG_CARD);
@@ -262,7 +238,6 @@ public class GacoanApp extends JFrame {
             setFocusable(false);
             setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
-            // Set custom basic UI to bypass native OS blue highlights and focus border
             setUI(new javax.swing.plaf.basic.BasicComboBoxUI() {
                 @Override
                 protected JButton createArrowButton() {
@@ -295,7 +270,6 @@ public class GacoanApp extends JFrame {
                 }
             });
 
-            // Custom Item Renderer
             setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -308,7 +282,6 @@ public class GacoanApp extends JFrame {
                 }
             });
 
-            // Modern dropdown list background fix
             try {
                 Object child = getAccessibleContext().getAccessibleChild(0);
                 if (child instanceof javax.swing.plaf.basic.ComboPopup) {
@@ -317,12 +290,10 @@ public class GacoanApp extends JFrame {
                     list.setForeground(UITheme.COLOR_TEXT_PRIMARY);
                 }
             } catch (Exception e) {
-                // Ignore fallback
             }
         }
     }
 
-    // 5. Custom Thin Modern Scrollbar UI
     static class ModernScrollbarUI extends BasicScrollBarUI {
         @Override
         protected JButton createDecreaseButton(int orientation) {
@@ -344,7 +315,6 @@ public class GacoanApp extends JFrame {
 
         @Override
         protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-            // Keep background transparent
         }
 
         @Override
@@ -357,7 +327,6 @@ public class GacoanApp extends JFrame {
         }
     }
 
-    // 6. Custom Modern Table Cell Renderer (To fix white background bug on Windows LF)
     static class ModernTableCellRenderer extends DefaultTableCellRenderer {
         public ModernTableCellRenderer(int alignment) {
             setHorizontalAlignment(alignment);
@@ -374,7 +343,6 @@ public class GacoanApp extends JFrame {
         }
     }
 
-    // 7. Custom Modern Table Header Renderer (To fix white background bug on Windows LF)
     static class ModernTableHeaderRenderer extends DefaultTableCellRenderer {
         public ModernTableHeaderRenderer() {
             setOpaque(true);
@@ -397,14 +365,10 @@ public class GacoanApp extends JFrame {
         }
     }
 
-    // =========================================================================
-    // SCREEN 1: PRE-FLIGHT COMPATIBILITY CHECKER (MODERN DESIGN)
-    // =========================================================================
     private JPanel buildPreFlightScreen() {
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(UITheme.COLOR_BG_APP);
 
-        // Floating Light Mode Diagnostic Card
         JPanel boxOuter = new JPanel(new BorderLayout());
         UITheme.applyAntigravityEffect(boxOuter);
         boxOuter.setPreferredSize(new Dimension(640, 580));
@@ -415,7 +379,6 @@ public class GacoanApp extends JFrame {
         box.setBorder(new EmptyBorder(40, 45, 40, 45));
         boxOuter.add(box, BorderLayout.CENTER);
 
-        // Gacoan Header (Orange branding)
         JLabel logo = new JLabel("MIE GACOAN");
         logo.setFont(new Font("Segoe UI Black", Font.BOLD, 38));
         logo.setForeground(UITheme.COLOR_ACCENT_PRIMARY);
@@ -431,25 +394,20 @@ public class GacoanApp extends JFrame {
 
         box.add(Box.createRigidArea(new Dimension(0, 30)));
 
-        // Run Pre-flight Checks
         PreFlightCheck.DiagnosticResult diag = PreFlightCheck.runCheck();
 
-        // 1. JDK Row
         box.add(buildDiagnosticPanel("Java Runtime (JDK/JRE) Check", 
                 diag.javaOk ? "PASSED (v" + System.getProperty("java.version") + ")" : "FAILED", diag.javaOk));
         box.add(Box.createRigidArea(new Dimension(0, 16)));
 
-        // 2. GCC/g++ Row
         box.add(buildDiagnosticPanel("C++ Compiler Status (g++)", 
                 diag.gccOk ? "PASSED (MinGW-w64)" : "FAILED (g++ compiler missing on PATH)", diag.gccOk));
         box.add(Box.createRigidArea(new Dimension(0, 16)));
 
-        // 3. JNI DLL Row
         box.add(buildDiagnosticPanel("GacoanEngine JNI Library Check", 
                 diag.dllOk ? "LOADED SUCCESSFUL" : "NOT LOADED / NEEDS COMPILATION", diag.dllOk));
         box.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // DLL Detail Text
         JLabel dllDetail = new JLabel("Library Status: " + diag.dllPath);
         dllDetail.setFont(new Font("Monospaced", Font.PLAIN, 10));
         dllDetail.setForeground(diag.dllOk ? UITheme.COLOR_ACCENT_SECONDARY : UITheme.COLOR_ACCENT_PRIMARY);
@@ -458,7 +416,6 @@ public class GacoanApp extends JFrame {
 
         box.add(Box.createRigidArea(new Dimension(0, 35)));
 
-        // Checkout enter application button
         String btnText = diag.dllOk ? "BUKA APLIKASI UTAMA (JNI AKTIF)" : "BUKA APLIKASI (MODE FALLBACK)";
         ModernButton btnGo = new ModernButton(btnText, diag.dllOk ? UITheme.COLOR_ACCENT_SECONDARY : UITheme.COLOR_ACCENT_PRIMARY, diag.dllOk ? UITheme.COLOR_ACCENT_SECONDARY.brighter() : UITheme.COLOR_ACCENT_PRIMARY.brighter(), 16);
         btnGo.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -499,13 +456,11 @@ public class GacoanApp extends JFrame {
         rowCard.setMaximumSize(new Dimension(540, 60));
         rowCard.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Check Title
         JLabel title = new JLabel(titleText);
         title.setFont(new Font("Segoe UI Semibold", Font.BOLD, 13));
         title.setForeground(UITheme.COLOR_TEXT_PRIMARY);
         rowCard.add(title, BorderLayout.WEST);
 
-        // Check Status Indicator
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         rightPanel.setOpaque(false);
 
@@ -513,7 +468,6 @@ public class GacoanApp extends JFrame {
         statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         statusLabel.setForeground(isOk ? UITheme.COLOR_ACCENT_SECONDARY : UITheme.COLOR_ACCENT_PRIMARY);
 
-        // Dot indicator
         JPanel dot = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -534,25 +488,19 @@ public class GacoanApp extends JFrame {
         return rowCard;
     }
 
-    // =========================================================================
-    // SCREEN 2: MAIN APPLICATION WORKSPACE
-    // =========================================================================
     private JPanel buildMainAppScreen() {
         JPanel workspace = new JPanel(new BorderLayout());
         workspace.setBackground(UITheme.COLOR_BG_APP);
 
-        // Header Navigation Bar
         JPanel navBar = new JPanel(new BorderLayout());
         navBar.setBackground(UITheme.COLOR_BG_CARD);
         navBar.setBorder(new EmptyBorder(16, 24, 16, 24));
 
-        // Logo
         JLabel appLogo = new JLabel("MIE GACOAN");
         appLogo.setFont(new Font("Segoe UI Black", Font.BOLD, 24));
         appLogo.setForeground(UITheme.COLOR_ACCENT_PRIMARY);
         navBar.add(appLogo, BorderLayout.WEST);
 
-        // Custom High-End Flat Tabs Buttons (Eliminating standard Java tabs)
         JPanel tabButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
         tabButtonsPanel.setOpaque(false);
 
@@ -592,20 +540,17 @@ public class GacoanApp extends JFrame {
 
         workspace.add(navBar, BorderLayout.NORTH);
 
-        // JTabbedPane inside (Hide actual tabs to show our custom styled flat buttons)
         appTabbedPane = new JTabbedPane();
         appTabbedPane.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
             @Override
             protected int calculateTabAreaHeight(int tabPlacement, int runCount, int maxTabHeight) {
-                return 0; // Hides JTabbedPane default ugly top tabs completely!
+                return 0;
             }
         });
         appTabbedPane.setBackground(UITheme.COLOR_BG_APP);
         appTabbedPane.setBorder(null);
 
-        // Customer Panel
         JPanel panelPelanggan = buildCustomerOrderingTab();
-        // Kitchen Panel
         JPanel panelDapur = buildKitchenTab();
 
         appTabbedPane.addTab(null, panelPelanggan);
@@ -616,19 +561,14 @@ public class GacoanApp extends JFrame {
         return workspace;
     }
 
-    // =========================================================================
-    // SUBPANEL: CUSTOMER SELF-ORDERING PORTAL
-    // =========================================================================
     private JPanel buildCustomerOrderingTab() {
         JPanel tab = new JPanel(new BorderLayout(20, 20));
         tab.setBackground(UITheme.COLOR_BG_APP);
         tab.setBorder(new EmptyBorder(20, 24, 20, 24));
 
-        // Subsystem: Left Side (QR Scan simulation & Catalog), Right Side (Floating Bill Cart)
         JPanel leftLayout = new JPanel(new BorderLayout(15, 15));
         leftLayout.setOpaque(false);
 
-        // A. Floating QR Scan Simulation Card
         JPanel qrCardOuter = new JPanel(new BorderLayout());
         UITheme.applyAntigravityEffect(qrCardOuter);
         JPanel qrCard = new JPanel(new BorderLayout(15, 15));
@@ -636,20 +576,18 @@ public class GacoanApp extends JFrame {
         qrCard.setBorder(new EmptyBorder(16, 20, 16, 20));
         qrCardOuter.add(qrCard, BorderLayout.CENTER);
 
-        // Left Label
         lblTableStatus = new JLabel("SILAKAN SCAN BARCODE QR PADA MEJA KIOSK");
         lblTableStatus.setFont(new Font("Segoe UI Semibold", Font.BOLD, 13));
         lblTableStatus.setForeground(UITheme.COLOR_TEXT_SECONDARY);
         qrCard.add(lblTableStatus, BorderLayout.WEST);
 
-        // Right simulation action button
         btnScanQr = new ModernButton("PINDAI BARCODE QR MEJA", UITheme.COLOR_ACCENT_PRIMARY, UITheme.COLOR_ACCENT_PRIMARY.darker(), 12);
         btnScanQr.setFont(new Font("Segoe UI", Font.BOLD, 11));
         btnScanQr.setForeground(Color.WHITE);
         btnScanQr.setPreferredSize(new Dimension(180, 32));
         btnScanQr.addActionListener(e -> {
             Random r = new Random();
-            nomorMejaLocked = r.nextInt(25) + 1; // 1 to 25
+            nomorMejaLocked = r.nextInt(25) + 1;
             lblTableStatus.setText("QR TERVERIFIKASI MEJA: MEJA " + nomorMejaLocked + " (TERKUNCI ✓)");
             lblTableStatus.setForeground(UITheme.COLOR_ACCENT_SECONDARY);
             btnScanQr.setEnabled(false);
@@ -664,11 +602,9 @@ public class GacoanApp extends JFrame {
 
         leftLayout.add(qrCardOuter, BorderLayout.NORTH);
 
-        // B. Catalog Panel (Filter + Food Grid Cards)
         JPanel catalogPanel = new JPanel(new BorderLayout(15, 15));
         catalogPanel.setOpaque(false);
 
-        // Rounded Category filter buttons
         JPanel filterRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         filterRow.setOpaque(false);
 
@@ -687,7 +623,6 @@ public class GacoanApp extends JFrame {
         }
         catalogPanel.add(filterRow, BorderLayout.NORTH);
 
-        // Food Grid Scroll Pane
         panelGridMenu = new JPanel(new GridLayout(0, 2, 16, 16));
         panelGridMenu.setBackground(UITheme.COLOR_BG_APP);
         
@@ -705,10 +640,9 @@ public class GacoanApp extends JFrame {
         catalogPanel.add(catalogScroll, BorderLayout.CENTER);
         leftLayout.add(catalogPanel, BorderLayout.CENTER);
 
-        renderModernCatalogGrid(); // Initial display
+        renderModernCatalogGrid();
         tab.add(leftLayout, BorderLayout.CENTER);
 
-        // C. Sidebar Floating Cart Panel
         JPanel cartCardOuter = new JPanel(new BorderLayout());
         cartCardOuter.setPreferredSize(new Dimension(420, 0));
         UITheme.applyAntigravityEffect(cartCardOuter);
@@ -722,7 +656,6 @@ public class GacoanApp extends JFrame {
         lblCartTitle.setForeground(UITheme.COLOR_TEXT_PRIMARY);
         cartCard.add(lblCartTitle, BorderLayout.NORTH);
 
-        // Table Model Flat Design without borders and lines
         String[] columns = {"Pesanan", "Porsi", "Harga"};
         modelTabelKeranjang = new DefaultTableModel(columns, 0) {
             @Override
@@ -771,7 +704,6 @@ public class GacoanApp extends JFrame {
         cartScroll.getVerticalScrollBar().setUI(new ModernScrollbarUI());
         cartCard.add(cartScroll, BorderLayout.CENTER);
 
-        // Billing totals panel
         JPanel totalsPanel = new JPanel();
         totalsPanel.setLayout(new BoxLayout(totalsPanel, BoxLayout.Y_AXIS));
         totalsPanel.setOpaque(false);
@@ -795,7 +727,6 @@ public class GacoanApp extends JFrame {
         totalsPanel.add(lblTotal);
         totalsPanel.add(Box.createRigidArea(new Dimension(0, 16)));
 
-        // Large Checkout Button
         ModernButton btnCheckout = new ModernButton("KONFIRMASI BAYAR & STRUK", UITheme.COLOR_ACCENT_PRIMARY, UITheme.COLOR_ACCENT_PRIMARY.darker(), 16);
         btnCheckout.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnCheckout.setForeground(Color.WHITE);
@@ -815,7 +746,6 @@ public class GacoanApp extends JFrame {
                 return;
             }
 
-            // Create Transaction Object
             String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
             String idNota = "GCN-" + timeStamp;
             
@@ -824,7 +754,6 @@ public class GacoanApp extends JFrame {
                 transaksi.tambahItem(it);
             }
 
-            // Compute receipt ASCII via JNI C++ DLL
             String receiptText = "";
             if (GacoanEngine.isLibraryLoaded()) {
                 try {
@@ -836,18 +765,14 @@ public class GacoanApp extends JFrame {
                 receiptText = generateJavaFallbackNota(transaksi);
             }
 
-            // Add order to Kitchen KDS queue
             antreanDapur.add(transaksi);
 
-            // Pop gorgeous receipt Dialog
             showAnimatedReceiptDialog(receiptText);
 
-            // Reset cart state
             keranjangBelanja.clear();
             modelTabelKeranjang.setRowCount(0);
             updateCartSummary();
 
-            // Unlock scanner UI
             nomorMejaLocked = 0;
             btnScanQr.setEnabled(true);
             btnScanQr.setNormalBg(UITheme.COLOR_ACCENT_PRIMARY);
@@ -857,7 +782,6 @@ public class GacoanApp extends JFrame {
             lblTableStatus.setText("SILAKAN SCAN BARCODE QR PADA MEJA KIOSK");
             lblTableStatus.setForeground(UITheme.COLOR_TEXT_SECONDARY);
 
-            // Sync kitchen panels
             refreshKdsViews();
         });
 
@@ -877,7 +801,6 @@ public class GacoanApp extends JFrame {
                 continue;
             }
 
-            // Clean modern product card
             JPanel cardOuter = new JPanel(new BorderLayout());
             UITheme.applyAntigravityEffect(cardOuter);
             JPanel card = new JPanel(new BorderLayout(15, 12));
@@ -885,7 +808,6 @@ public class GacoanApp extends JFrame {
             card.setBorder(new EmptyBorder(24, 24, 24, 24));
             cardOuter.add(card, BorderLayout.CENTER);
 
-            // Product Details (Title, Category Tag, Price)
             JPanel top = new JPanel(new BorderLayout(5, 5));
             top.setOpaque(false);
 
@@ -897,7 +819,6 @@ public class GacoanApp extends JFrame {
             name.setForeground(UITheme.COLOR_TEXT_PRIMARY);
             textWrapper.add(name);
 
-            // Styled Category Pill
             JPanel tagWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
             tagWrapper.setOpaque(false);
 
@@ -928,7 +849,6 @@ public class GacoanApp extends JFrame {
 
             top.add(textWrapper, BorderLayout.WEST);
 
-            // Large Green Price Label
             String priceText = item.getKategori().equalsIgnoreCase("Makanan") ? "Rp 11K-13K" : (item.getKategori().equalsIgnoreCase("Dimsum") ? "Rp 10K" : "Rp 9K");
             JLabel price = new JLabel(priceText);
             price.setFont(new Font("Segoe UI Black", Font.BOLD, 16));
@@ -937,7 +857,6 @@ public class GacoanApp extends JFrame {
 
             card.add(top, BorderLayout.NORTH);
 
-            // Choice parameters panel (Notes and level selection)
             boolean isFood = item.getKategori().equalsIgnoreCase("Makanan");
             JPanel optionsPanel = new JPanel();
             optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
@@ -985,7 +904,6 @@ public class GacoanApp extends JFrame {
 
             card.add(optionsPanel, BorderLayout.CENTER);
 
-            // Card Bottom: Large add button
             ModernButton btnAdd = new ModernButton("TAMBAHKAN KAN", UITheme.COLOR_ACCENT_PRIMARY, UITheme.COLOR_ACCENT_PRIMARY.darker(), 16);
             btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 12));
             btnAdd.setForeground(Color.WHITE);
@@ -1003,7 +921,6 @@ public class GacoanApp extends JFrame {
                     userNote = "";
                 }
 
-                // Check cart for duplicates
                 boolean duplicate = false;
                 for (ItemPesanan it : keranjangBelanja) {
                     if (it.getMenu().getId().equals(item.getId()) && it.getLevelPedas() == selectedLevel) {
@@ -1080,8 +997,8 @@ public class GacoanApp extends JFrame {
         dialog.setUndecorated(true);
         dialog.setShape(new RoundRectangle2D.Double(0, 0, 480, 580, 24, 24));
         dialog.setLocationRelativeTo(this);
-
-        ModernCard container = new ModernCard(24, COLOR_BG, COLOR_BORDER, 2);
+        dialog.setBackground(new Color(0, 0, 0, 0));
+        ModernCard container = new ModernCard(24, UITheme.COLOR_BG_CARD, new Color(229, 231, 235), 2);
         container.setLayout(new BorderLayout(15, 15));
         container.setBorder(new EmptyBorder(24, 24, 24, 24));
 
@@ -1091,11 +1008,10 @@ public class GacoanApp extends JFrame {
         title.setHorizontalAlignment(JLabel.CENTER);
         container.add(title, BorderLayout.NORTH);
 
-        // Stylized Amber monospaced receipt text area mimicking a POS terminal
         JTextArea tx = new JTextArea(formatStr);
         tx.setFont(new Font("Monospaced", Font.PLAIN, 12));
         tx.setBackground(new Color(12, 12, 16));
-        tx.setForeground(new Color(245, 158, 11)); // Amber POS neon color
+        tx.setForeground(new Color(245, 158, 11));
         tx.setEditable(false);
         tx.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(COLOR_BORDER, 1),
@@ -1161,15 +1077,11 @@ public class GacoanApp extends JFrame {
         return sb.toString();
     }
 
-    // =========================================================================
-    // SUBPANEL: KITCHEN DISPLAY SYSTEM (KDS) & MONITOR
-    // =========================================================================
     private JPanel buildKitchenTab() {
         JPanel tab = new JPanel(new GridLayout(1, 2, 24, 24));
         tab.setBackground(UITheme.COLOR_BG_APP);
         tab.setBorder(new EmptyBorder(24, 24, 24, 24));
 
-        // Subpanel 1: Active Dapur Board (Trello-like active column)
         JPanel colActive = new JPanel(new BorderLayout(15, 15));
         colActive.setOpaque(false);
 
@@ -1191,7 +1103,6 @@ public class GacoanApp extends JFrame {
 
         tab.add(colActive);
 
-        // Subpanel 2: History Dapur Board (Called history column)
         JPanel colHistory = new JPanel(new BorderLayout(15, 15));
         colHistory.setOpaque(false);
 
@@ -1213,14 +1124,12 @@ public class GacoanApp extends JFrame {
 
         tab.add(colHistory);
 
-        // Load content
         refreshKdsViews();
 
         return tab;
     }
 
     private void refreshKdsViews() {
-        // 1. Sync Active Queue Cards
         panelKdsActiveQueue.removeAll();
         if (antreanDapur.isEmpty()) {
             panelKdsActiveQueue.add(createKdsPlaceholder("Belum ada antrean makanan masuk. Dapur bersih!"));
@@ -1231,7 +1140,6 @@ public class GacoanApp extends JFrame {
             }
         }
 
-        // 2. Sync History Queue Cards
         panelKdsHistoryQueue.removeAll();
         if (riwayatPanggilan.isEmpty()) {
             panelKdsHistoryQueue.add(createKdsPlaceholder("Belum ada riwayat panggilan TOA."));
@@ -1270,7 +1178,6 @@ public class GacoanApp extends JFrame {
     }
 
     private JPanel buildOrderQueueCard(TransaksiPesanan trans, boolean isActive) {
-        // Round Card with floating border
         JPanel cardOuter = new JPanel(new BorderLayout());
         UITheme.applyAntigravityEffect(cardOuter);
         cardOuter.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
@@ -1281,7 +1188,6 @@ public class GacoanApp extends JFrame {
         card.setBorder(new EmptyBorder(16, 20, 16, 20));
         cardOuter.add(card, BorderLayout.CENTER);
 
-        // Header (Table lock indicator & invoice timestamp)
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
 
@@ -1297,7 +1203,6 @@ public class GacoanApp extends JFrame {
 
         card.add(headerPanel, BorderLayout.NORTH);
 
-        // Body (Items to cook / prepare)
         JPanel bodyPanel = new JPanel();
         bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
         bodyPanel.setOpaque(false);
@@ -1319,7 +1224,6 @@ public class GacoanApp extends JFrame {
         }
         card.add(bodyPanel, BorderLayout.CENTER);
 
-        // Footer Actions (Selesai Masak / Panggil Ulang)
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         footerPanel.setOpaque(false);
 
@@ -1333,7 +1237,6 @@ public class GacoanApp extends JFrame {
                 trans.setStatus("SELESAI");
                 riwayatPanggilan.add(trans);
 
-                // Run Windows SAPI Call JNI in an asynchronous worker thread so the UI is 100% fluid!
                 new Thread(() -> {
                     if (PreFlightCheck.runCheck().dllOk) {
                         try {
@@ -1381,14 +1284,11 @@ public class GacoanApp extends JFrame {
     }
 
     public static void main(String[] args) {
-        // System Look & Feel setup
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            // Ignore
         }
 
-        // Set Light Mode theme properties for defaults
         UIManager.put("TabbedPane.shadow", UITheme.COLOR_BG_APP);
         UIManager.put("TabbedPane.darkShadow", UITheme.COLOR_BG_APP);
         UIManager.put("TabbedPane.light", UITheme.COLOR_BG_APP);

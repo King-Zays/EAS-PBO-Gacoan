@@ -23,11 +23,9 @@ public class PreFlightCheck {
     public static DiagnosticResult runCheck() {
         DiagnosticResult result = new DiagnosticResult();
         
-        // 1. Java check
         result.javaVersion = System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")";
-        result.javaOk = true; // Since the app is running, Java is running.
+        result.javaOk = true;
 
-        // 2. GCC check (MinGW 64-bit compiler check)
         try {
             Process process = new ProcessBuilder("g++", "--version").start();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -45,13 +43,10 @@ public class PreFlightCheck {
             result.gccVersion = "g++ compiler not found in system PATH. MinGW-w64 is required.";
         }
 
-        // 3. DLL Check
-        // First try to check if it has already been successfully loaded by static blocks
         result.dllOk = GacoanEngine.isLibraryLoaded();
         if (result.dllOk) {
             result.dllPath = "Successfully loaded in memory!";
         } else {
-            // Attempt to look for the DLL and load it manually
             File dllInBin = new File("bin/GacoanEngine.dll");
             File dllInRoot = new File("GacoanEngine.dll");
             if (dllInBin.exists()) {

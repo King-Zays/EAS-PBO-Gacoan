@@ -7,7 +7,7 @@ public class TransaksiPesanan {
     private String idNota;
     private int nomorMeja;
     private List<ItemPesanan> daftarBelanja;
-    private String status; // PENDING, DIPROSES, SELESAI
+    private String status;
 
     public TransaksiPesanan(String idNota, int nomorMeja) {
         this.idNota = idNota;

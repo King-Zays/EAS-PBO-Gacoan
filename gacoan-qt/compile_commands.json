@@ -1,0 +1,26 @@
+[
+{
+  "directory": "C:/Users/refia/koding/PBO/EAS-PBO-Gacoan/gacoan-qt/build",
+  "command": "C:\\Qt\\Tools\\mingw1310_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 -IC:/Users/refia/koding/PBO/EAS-PBO-Gacoan/gacoan-qt/build/GacoanQt_autogen/include -isystem C:/Qt/6.11.1/mingw_64/include/QtWidgets -isystem C:/Qt/6.11.1/mingw_64/include -isystem C:/Qt/6.11.1/mingw_64/include/QtCore -isystem C:/Qt/6.11.1/mingw_64/mkspecs/win32-g++ -isystem C:/Qt/6.11.1/mingw_64/include/QtGui -std=gnu++17 -o CMakeFiles\\GacoanQt.dir\\GacoanQt_autogen\\mocs_compilation.cpp.obj -c C:\\Users\\refia\\koding\\PBO\\EAS-PBO-Gacoan\\gacoan-qt\\build\\GacoanQt_autogen\\mocs_compilation.cpp",
+  "file": "C:\\Users\\refia\\koding\\PBO\\EAS-PBO-Gacoan\\gacoan-qt\\build\\GacoanQt_autogen\\mocs_compilation.cpp",
+  "output": "CMakeFiles\\GacoanQt.dir\\GacoanQt_autogen\\mocs_compilation.cpp.obj"
+},
+{
+  "directory": "C:/Users/refia/koding/PBO/EAS-PBO-Gacoan/gacoan-qt/build",
+  "command": "C:\\Qt\\Tools\\mingw1310_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 -IC:/Users/refia/koding/PBO/EAS-PBO-Gacoan/gacoan-qt/build/GacoanQt_autogen/include -isystem C:/Qt/6.11.1/mingw_64/include/QtWidgets -isystem C:/Qt/6.11.1/mingw_64/include -isystem C:/Qt/6.11.1/mingw_64/include/QtCore -isystem C:/Qt/6.11.1/mingw_64/mkspecs/win32-g++ -isystem C:/Qt/6.11.1/mingw_64/include/QtGui -std=gnu++17 -o CMakeFiles\\GacoanQt.dir\\main.cpp.obj -c C:\\Users\\refia\\koding\\PBO\\EAS-PBO-Gacoan\\gacoan-qt\\main.cpp",
+  "file": "C:\\Users\\refia\\koding\\PBO\\EAS-PBO-Gacoan\\gacoan-qt\\main.cpp",
+  "output": "CMakeFiles\\GacoanQt.dir\\main.cpp.obj"
+},
+{
+  "directory": "C:/Users/refia/koding/PBO/EAS-PBO-Gacoan/gacoan-qt/build",
+  "command": "C:\\Qt\\Tools\\mingw1310_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 -IC:/Users/refia/koding/PBO/EAS-PBO-Gacoan/gacoan-qt/build/GacoanQt_autogen/include -isystem C:/Qt/6.11.1/mingw_64/include/QtWidgets -isystem C:/Qt/6.11.1/mingw_64/include -isystem C:/Qt/6.11.1/mingw_64/include/QtCore -isystem C:/Qt/6.11.1/mingw_64/mkspecs/win32-g++ -isystem C:/Qt/6.11.1/mingw_64/include/QtGui -std=gnu++17 -o CMakeFiles\\GacoanQt.dir\\GacoanApp.cpp.obj -c C:\\Users\\refia\\koding\\PBO\\EAS-PBO-Gacoan\\gacoan-qt\\GacoanApp.cpp",
+  "file": "C:\\Users\\refia\\koding\\PBO\\EAS-PBO-Gacoan\\gacoan-qt\\GacoanApp.cpp",
+  "output": "CMakeFiles\\GacoanQt.dir\\GacoanApp.cpp.obj"
+},
+{
+  "directory": "C:/Users/refia/koding/PBO/EAS-PBO-Gacoan/gacoan-qt/build",
+  "command": "C:\\Qt\\Tools\\mingw1310_64\\bin\\g++.exe -DMINGW_HAS_SECURE_API=1 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 -IC:/Users/refia/koding/PBO/EAS-PBO-Gacoan/gacoan-qt/build/GacoanQt_autogen/include -isystem C:/Qt/6.11.1/mingw_64/include/QtWidgets -isystem C:/Qt/6.11.1/mingw_64/include -isystem C:/Qt/6.11.1/mingw_64/include/QtCore -isystem C:/Qt/6.11.1/mingw_64/mkspecs/win32-g++ -isystem C:/Qt/6.11.1/mingw_64/include/QtGui -std=gnu++17 -o CMakeFiles\\GacoanQt.dir\\GacoanEngine.cpp.obj -c C:\\Users\\refia\\koding\\PBO\\EAS-PBO-Gacoan\\gacoan-qt\\GacoanEngine.cpp",
+  "file": "C:\\Users\\refia\\koding\\PBO\\EAS-PBO-Gacoan\\gacoan-qt\\GacoanEngine.cpp",
+  "output": "CMakeFiles\\GacoanQt.dir\\GacoanEngine.cpp.obj"
+}
+]

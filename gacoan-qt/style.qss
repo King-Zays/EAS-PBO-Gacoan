@@ -1,0 +1,346 @@
+QMainWindow, QWidget#centralWidget {
+    background-color: #F3F4F6;
+}
+
+QLabel {
+    color: #1E293B;
+    font-family: "Segoe UI";
+}
+
+QWidget#navBar {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+QLabel#appLogo {
+    font-size: 24px;
+    font-weight: 900;
+    color: #EA580C;
+    font-family: "Segoe UI Black";
+}
+
+QPushButton#navBtnActive {
+    background-color: #EA580C;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 18px;
+    padding: 8px 20px;
+    font-weight: bold;
+    font-size: 12px;
+    font-family: "Segoe UI";
+}
+
+QPushButton#navBtnActive:hover {
+    background-color: #DC5309;
+}
+
+QPushButton#navBtnInactive {
+    background-color: #F1F5F9;
+    color: #1E293B;
+    border: none;
+    border-radius: 18px;
+    padding: 8px 20px;
+    font-weight: bold;
+    font-size: 12px;
+    font-family: "Segoe UI";
+}
+
+QPushButton#navBtnInactive:hover {
+    background-color: #E2E8F0;
+}
+
+QFrame.card {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    border: none;
+}
+
+QPushButton.pillBtn {
+    background-color: #EA580C;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-weight: bold;
+    font-size: 12px;
+    font-family: "Segoe UI";
+}
+
+QPushButton.pillBtn:hover {
+    background-color: #DC5309;
+}
+
+QPushButton.pillBtn:pressed {
+    background-color: #C04A08;
+}
+
+QPushButton.pillBtnGreen {
+    background-color: #22C55E;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-weight: bold;
+    font-size: 11px;
+    font-family: "Segoe UI";
+}
+
+QPushButton.pillBtnGreen:hover {
+    background-color: #1DAF54;
+}
+
+QPushButton.pillBtnGhost {
+    background-color: #F1F5F9;
+    color: #1E293B;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-weight: bold;
+    font-size: 11px;
+    font-family: "Segoe UI";
+}
+
+QPushButton.pillBtnGhost:hover {
+    background-color: #E2E8F0;
+}
+
+QPushButton.filterBtn {
+    background-color: #FFFFFF;
+    color: #1E293B;
+    border: none;
+    border-radius: 16px;
+    padding: 6px 18px;
+    font-weight: bold;
+    font-size: 11px;
+    font-family: "Segoe UI";
+}
+
+QPushButton.filterBtn:hover {
+    background-color: #F1F5F9;
+}
+
+QPushButton.filterBtnActive {
+    background-color: #EA580C;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 16px;
+    padding: 6px 18px;
+    font-weight: bold;
+    font-size: 11px;
+    font-family: "Segoe UI";
+}
+
+QComboBox {
+    background-color: #FFFFFF;
+    color: #1E293B;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-family: "Segoe UI";
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 24px;
+}
+
+QComboBox::down-arrow {
+    image: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #64748B;
+    margin-right: 8px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #FFFFFF;
+    color: #1E293B;
+    border: 1px solid #D1D5DB;
+    selection-background-color: #EA580C;
+    selection-color: #FFFFFF;
+    padding: 4px;
+}
+
+QLineEdit {
+    background-color: #F1F5F9;
+    color: #1E293B;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 12px;
+    font-family: "Segoe UI";
+}
+
+QLineEdit:focus {
+    border: 1px solid #EA580C;
+}
+
+QLineEdit[placeholder="true"] {
+    color: #94A3B8;
+}
+
+QTableWidget {
+    background-color: #FFFFFF;
+    color: #1E293B;
+    gridline-color: #F3F4F6;
+    border: none;
+    font-size: 12px;
+    font-family: "Segoe UI Semibold";
+}
+
+QTableWidget::item {
+    padding: 6px 10px;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+QTableWidget::item:selected {
+    background-color: #FFF7ED;
+    color: #1E293B;
+}
+
+QHeaderView::section {
+    background-color: #FFFFFF;
+    color: #64748B;
+    border: none;
+    border-bottom: 1px solid #E5E7EB;
+    padding: 8px 10px;
+    font-weight: bold;
+    font-size: 12px;
+    font-family: "Segoe UI";
+}
+
+QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    border: none;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #B4B4C3;
+    border-radius: 4px;
+    min-height: 30px;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: transparent;
+}
+
+QScrollBar:horizontal {
+    height: 0px;
+}
+
+QScrollArea, QScrollArea > QWidget, QScrollArea > QWidget > QWidget {
+    background-color: #F3F4F6;
+    background: #F3F4F6;
+    border: none;
+}
+
+QWidget#customerTab, QWidget#kitchenTab {
+    background-color: #F3F4F6;
+}
+
+QLabel.catPillMakanan {
+    background-color: #EA580C;
+    color: #FFFFFF;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 9px;
+    font-weight: 900;
+    font-family: "Segoe UI Black";
+}
+
+QLabel.catPillDimsum {
+    background-color: #06B6D4;
+    color: #FFFFFF;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 9px;
+    font-weight: 900;
+    font-family: "Segoe UI Black";
+}
+
+QLabel.catPillMinuman {
+    background-color: #A855F7;
+    color: #FFFFFF;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 9px;
+    font-weight: 900;
+    font-family: "Segoe UI Black";
+}
+
+QTextEdit#receiptText {
+    background-color: #0C0C10;
+    color: #F59E0B;
+    border: 1px solid #303042;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: "Consolas", "Monospaced";
+    font-size: 12px;
+}
+
+QLabel.textPrimary {
+    color: #1E293B;
+}
+
+QLabel.textSecondary {
+    color: #64748B;
+}
+
+QLabel.textAccent {
+    color: #EA580C;
+}
+
+QLabel.textGreen {
+    color: #22C55E;
+}
+
+QLabel.priceLabel {
+    color: #22C55E;
+    font-weight: 900;
+    font-size: 16px;
+    font-family: "Segoe UI Black";
+}
+
+QLabel.totalLabel {
+    color: #1E293B;
+    font-weight: 900;
+    font-size: 22px;
+    font-family: "Segoe UI Black";
+}
+
+QWidget#splashWrapper {
+    background-color: #F3F4F6;
+}
+
+QFrame#splashCard {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    border: none;
+}
+
+QLabel#splashLogo {
+    color: #EA580C;
+    font-size: 38px;
+    font-weight: 900;
+    font-family: "Segoe UI Black";
+}
+
+QLabel#splashSubtext {
+    color: #64748B;
+    font-size: 14px;
+    font-family: "Segoe UI Semibold";
+}
+
+QFrame.diagCard {
+    background-color: #F1F5F9;
+    border: 1px solid #D1D5DB;
+    border-radius: 16px;
+}

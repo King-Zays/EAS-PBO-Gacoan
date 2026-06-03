@@ -3,7 +3,7 @@ package gacoan;
 public class ItemPesanan {
     private Menu menu;
     private int kuantitas;
-    private int levelPedas; // 0 sampai 8
+    private int levelPedas;
     private String catatan;
 
     public ItemPesanan(Menu menu, int kuantitas, int levelPedas, String catatan) {

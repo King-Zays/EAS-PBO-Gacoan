@@ -23,6 +23,5 @@ public class GacoanEngine {
         return libraryLoaded;
     }
 
-    // Native method: calculates bill, formats ASCII receipt, and returns it as a String
     public native String hitungNota(TransaksiPesanan transaksi);
 }
