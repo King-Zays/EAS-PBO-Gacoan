@@ -21,7 +21,7 @@ echo [*] Using JDK from: %JAVA_HOME%
 
 REM 3. Compile Java classes and generate JNI Headers in the root
 echo [*] [1/3] Compiling Java classes and generating JNI Headers...
-javac -d bin -h . gacoan/Menu.java gacoan/ItemPesanan.java gacoan/TransaksiPesanan.java gacoan/GacoanEngine.java gacoan/SistemNotifikasi.java gacoan/PreFlightCheck.java gacoan/GacoanApp.java
+javac -d bin -h . gacoan/Menu.java gacoan/ItemPesanan.java gacoan/TransaksiPesanan.java gacoan/GacoanEngine.java gacoan/SistemNotifikasi.java gacoan/PreFlightCheck.java gacoan/UITheme.java gacoan/GacoanApp.java
 if %ERRORLEVEL% neq 0 (
     echo [X] ERROR: Java compilation failed!
     pause
