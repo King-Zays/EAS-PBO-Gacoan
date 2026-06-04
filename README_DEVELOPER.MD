@@ -1,5 +1,5 @@
 # DEVELOPER DOCUMENTATION & ARCHITECTURE GUIDE
-**Sistem Self-Ordering & Kitchen Display System (KDS) Mie Gacoan — JNI Hybrid**
+**Sistem Self-Ordering & Kitchen Display System (KDS) Mie Gacoan - JNI Hybrid**
 
 Dokumentasi ini disusun khusus sebagai acuan teknis berstandar tinggi bagi pengembang atau asisten kecerdasan buatan (AI coding agent seperti Vibe Code) agar dapat langsung memahami arsitektur, integrasi JNI native, sistem visual, dan alur kompilasi aplikasi ini secara instan.
 

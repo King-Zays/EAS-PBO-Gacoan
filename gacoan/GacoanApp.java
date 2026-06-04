@@ -438,7 +438,7 @@ public class GacoanApp extends JFrame {
 
         box.add(btnGo);
 
-        JLabel warning = new JLabel("UAS Pemrograman Berorientasi Objek — Teknik Informatika");
+        JLabel warning = new JLabel("UAS Pemrograman Berorientasi Objek - Teknik Informatika");
         warning.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         warning.setForeground(UITheme.COLOR_TEXT_SECONDARY);
         warning.setAlignmentX(Component.CENTER_ALIGNMENT);

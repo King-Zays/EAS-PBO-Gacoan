@@ -92,7 +92,7 @@ QWidget* GacoanApp::buildSplashScreen() {
     logo->setAlignment(Qt::AlignCenter);
     boxLayout->addWidget(logo);
 
-    QLabel* subtext = new QLabel("Sistem Self-Ordering & KDS — C++ Qt Edition");
+    QLabel* subtext = new QLabel("Sistem Self-Ordering & KDS - C++ Qt Edition");
     subtext->setObjectName("splashSubtext");
     subtext->setAlignment(Qt::AlignCenter);
     boxLayout->addSpacing(5);
@@ -125,7 +125,7 @@ QWidget* GacoanApp::buildSplashScreen() {
 
     boxLayout->addSpacing(20);
 
-    QLabel* footer = new QLabel("EAS Pemrograman Berorientasi Objek — Teknik Informatika");
+    QLabel* footer = new QLabel("EAS Pemrograman Berorientasi Objek - Teknik Informatika");
     footer->setProperty("class", "textSecondary");
     footer->setFont(QFont("Segoe UI", 11));
     footer->setAlignment(Qt::AlignCenter);

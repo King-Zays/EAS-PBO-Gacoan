@@ -277,13 +277,13 @@ QLabel.catPillMinuman {
 }
 
 QTextEdit#receiptText {
-    background-color: #0C0C10;
-    color: #F59E0B;
-    border: 1px solid #303042;
+    background-color: #F8FAFC;
+    color: #0F172A;
+    border: 1px dashed #CBD5E1;
     border-radius: 8px;
     padding: 12px;
     font-family: "Consolas", "Monospaced";
-    font-size: 12px;
+    font-size: 13px;
 }
 
 QLabel.textPrimary {
@@ -343,4 +343,27 @@ QFrame.diagCard {
     background-color: #F1F5F9;
     border: 1px solid #D1D5DB;
     border-radius: 16px;
+}
+
+QMessageBox, QDialog {
+    background-color: #FFFFFF;
+}
+
+QMessageBox QLabel {
+    color: #1E293B;
+    font-size: 13px;
+}
+
+QMessageBox QPushButton {
+    background-color: #EA580C;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 20px;
+    font-weight: bold;
+    min-width: 70px;
+}
+
+QMessageBox QPushButton:hover {
+    background-color: #DC5309;
 }

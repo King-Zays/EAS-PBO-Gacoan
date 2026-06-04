@@ -1,4 +1,4 @@
-# MIE GACOAN — C++ Qt Edition
+# MIE GACOAN - C++ Qt Edition
 
 Aplikasi Self-Ordering Kiosk & Kitchen Display System (KDS) yang di-port dari versi Java Swing ke C++ Qt Widgets secara mandiri (**tanpa JNI**).
 
@@ -79,7 +79,7 @@ gacoan-qt/
 - ✅ Pemilihan level pedas (0-8) dan catatan konsumen
 - ✅ Keranjang belanja dengan subtotal/pajak/total
 - ✅ Struk digital (receipt dialog)
-- ✅ Kitchen Display System (KDS) — Kanban board
+- ✅ Kitchen Display System (KDS) - Kanban board
 - ✅ Text-to-Speech panggilan meja (Windows SAPI)
 - ✅ Tema visual Light Mode identik dengan versi Java
-- ❌ Tidak ada JNI — sepenuhnya native C++
+- ❌ Tidak ada JNI - sepenuhnya native C++
