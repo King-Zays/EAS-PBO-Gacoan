@@ -408,7 +408,7 @@ public class GacoanApp extends JFrame {
                 diag.engineStatus, diag.engineOk));
         box.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        JLabel runtimeDetail = new JLabel("Runtime Mode: Pure Java - NetBeans ready");
+        JLabel runtimeDetail = new JLabel("Runtime Mode: NetBeans Ready");
         runtimeDetail.setFont(new Font("Monospaced", Font.PLAIN, 10));
         runtimeDetail.setForeground(UITheme.COLOR_ACCENT_SECONDARY);
         runtimeDetail.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -416,7 +416,7 @@ public class GacoanApp extends JFrame {
 
         box.add(Box.createRigidArea(new Dimension(0, 35)));
 
-        String btnText = "BUKA APLIKASI UTAMA (PURE JAVA)";
+        String btnText = "BUKA APLIKASI UTAMA";
         ModernButton btnGo = new ModernButton(btnText, UITheme.COLOR_ACCENT_SECONDARY, UITheme.COLOR_ACCENT_SECONDARY.brighter(), 16);
         btnGo.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnGo.setForeground(Color.WHITE);

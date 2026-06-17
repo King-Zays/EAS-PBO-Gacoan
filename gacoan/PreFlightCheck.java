@@ -26,7 +26,7 @@ public class PreFlightCheck {
         result.guiStatus = "READY (Java Swing)";
 
         result.engineOk = true;
-        result.engineStatus = "READY (Pure Java billing engine)";
+        result.engineStatus = "READY (Billing engine)";
 
         return result;
     }
