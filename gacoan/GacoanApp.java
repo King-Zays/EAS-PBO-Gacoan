@@ -385,7 +385,7 @@ public class GacoanApp extends JFrame {
         logo.setAlignmentX(Component.CENTER_ALIGNMENT);
         box.add(logo);
 
-        JLabel subtext = new JLabel("Sistem Self-Ordering & KDS JNI Hybrid");
+        JLabel subtext = new JLabel("Sistem Self-Ordering & KDS Pure Java");
         subtext.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
         subtext.setForeground(UITheme.COLOR_TEXT_SECONDARY);
         subtext.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -400,41 +400,31 @@ public class GacoanApp extends JFrame {
                 diag.javaOk ? "PASSED (v" + System.getProperty("java.version") + ")" : "FAILED", diag.javaOk));
         box.add(Box.createRigidArea(new Dimension(0, 16)));
 
-        box.add(buildDiagnosticPanel("C++ Compiler Status (g++)", 
-                diag.gccOk ? "PASSED (MinGW-w64)" : "FAILED (g++ compiler missing on PATH)", diag.gccOk));
+        box.add(buildDiagnosticPanel("Java Swing GUI Engine",
+                diag.guiStatus, diag.guiOk));
         box.add(Box.createRigidArea(new Dimension(0, 16)));
 
-        box.add(buildDiagnosticPanel("GacoanEngine JNI Library Check", 
-                diag.dllOk ? "LOADED SUCCESSFUL" : "NOT LOADED / NEEDS COMPILATION", diag.dllOk));
+        box.add(buildDiagnosticPanel("GacoanEngine Billing Check",
+                diag.engineStatus, diag.engineOk));
         box.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        JLabel dllDetail = new JLabel("Library Status: " + diag.dllPath);
-        dllDetail.setFont(new Font("Monospaced", Font.PLAIN, 10));
-        dllDetail.setForeground(diag.dllOk ? UITheme.COLOR_ACCENT_SECONDARY : UITheme.COLOR_ACCENT_PRIMARY);
-        dllDetail.setAlignmentX(Component.CENTER_ALIGNMENT);
-        box.add(dllDetail);
+        JLabel runtimeDetail = new JLabel("Runtime Mode: Pure Java - NetBeans ready");
+        runtimeDetail.setFont(new Font("Monospaced", Font.PLAIN, 10));
+        runtimeDetail.setForeground(UITheme.COLOR_ACCENT_SECONDARY);
+        runtimeDetail.setAlignmentX(Component.CENTER_ALIGNMENT);
+        box.add(runtimeDetail);
 
         box.add(Box.createRigidArea(new Dimension(0, 35)));
 
-        String btnText = diag.dllOk ? "BUKA APLIKASI UTAMA (JNI AKTIF)" : "BUKA APLIKASI (MODE FALLBACK)";
-        ModernButton btnGo = new ModernButton(btnText, diag.dllOk ? UITheme.COLOR_ACCENT_SECONDARY : UITheme.COLOR_ACCENT_PRIMARY, diag.dllOk ? UITheme.COLOR_ACCENT_SECONDARY.brighter() : UITheme.COLOR_ACCENT_PRIMARY.brighter(), 16);
+        String btnText = "BUKA APLIKASI UTAMA (PURE JAVA)";
+        ModernButton btnGo = new ModernButton(btnText, UITheme.COLOR_ACCENT_SECONDARY, UITheme.COLOR_ACCENT_SECONDARY.brighter(), 16);
         btnGo.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnGo.setForeground(Color.WHITE);
         btnGo.setPreferredSize(new Dimension(500, 48));
         btnGo.setMaximumSize(new Dimension(500, 48));
         btnGo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        btnGo.addActionListener(e -> {
-            if (!diag.dllOk) {
-                JOptionPane.showMessageDialog(GacoanApp.this, 
-                        "Sistem JNI GacoanEngine.dll gagal dimuat!\n" +
-                        "Aplikasi akan dijalankan menggunakan program simulasi internal Java (Fallback).\n\n" +
-                        "Untuk hasil optimal, silakan jalankan 'compile.bat' dari terminal\n" +
-                        "guna merakit pustaka C++ dll secara otomatis.", 
-                        "Pre-flight Library Fallback", JOptionPane.WARNING_MESSAGE);
-            }
-            mainCardLayout.show(mainCardPanel, "MAIN_APP");
-        });
+        btnGo.addActionListener(e -> mainCardLayout.show(mainCardPanel, "MAIN_APP"));
 
         box.add(btnGo);
 
@@ -754,16 +744,7 @@ public class GacoanApp extends JFrame {
                 transaksi.tambahItem(it);
             }
 
-            String receiptText = "";
-            if (GacoanEngine.isLibraryLoaded()) {
-                try {
-                    receiptText = billingEngine.hitungNota(transaksi);
-                } catch (Exception ex) {
-                    receiptText = generateJavaFallbackNota(transaksi);
-                }
-            } else {
-                receiptText = generateJavaFallbackNota(transaksi);
-            }
+            String receiptText = billingEngine.hitungNota(transaksi);
 
             antreanDapur.add(transaksi);
 
@@ -1033,50 +1014,6 @@ public class GacoanApp extends JFrame {
         dialog.setVisible(true);
     }
 
-    private String generateJavaFallbackNota(TransaksiPesanan trans) {
-        double sub = 0;
-        StringBuilder sb = new StringBuilder();
-        sb.append("================================================\n");
-        sb.append("                  MIE GACOAN                    \n");
-        sb.append("         PEMESANAN MANDIRI (FALLBACK)           \n");
-        sb.append("================================================\n");
-        sb.append(" ID NOTA : ").append(trans.getIdNota()).append("\n");
-        sb.append(" MEJA    : ").append(trans.getNomorMeja()).append("\n");
-        sb.append("------------------------------------------------\n");
-
-        for (ItemPesanan it : trans.getDaftarBelanja()) {
-            double price = it.getMenu().getHargaDasar();
-            double subRow = it.getKuantitas() * price;
-            sub += subRow;
-
-            sb.append(" ").append(it.getMenu().getNama());
-            if (it.getMenu().getKategori().equalsIgnoreCase("Makanan")) {
-                sb.append(" (Lvl ").append(it.getLevelPedas()).append(")");
-            }
-            sb.append("\n");
-            sb.append("   ").append(it.getKuantitas()).append(" x Rp ").append((long)price)
-              .append("                      Rp ").append((long)subRow).append("\n");
-            if (!it.getCatatan().isEmpty()) {
-                sb.append("   *Catatan: ").append(it.getCatatan()).append("\n");
-            }
-            sb.append("\n");
-        }
-
-        double tax = sub * 0.10;
-        double total = sub + tax;
-
-        sb.append("------------------------------------------------\n");
-        sb.append(" Subtotal            :        Rp ").append((long)sub).append("\n");
-        sb.append(" Pajak Resto (PB1 10%):       Rp ").append((long)tax).append("\n");
-        sb.append(" Biaya Layanan       :        Rp 0\n");
-        sb.append("------------------------------------------------\n");
-        sb.append(" TOTAL AKHIR         :        Rp ").append((long)total).append("\n");
-        sb.append("================================================\n");
-        sb.append("      Terima kasih atas pesanan Anda!           \n");
-        sb.append("================================================\n");
-        return sb.toString();
-    }
-
     private JPanel buildKitchenTab() {
         JPanel tab = new JPanel(new GridLayout(1, 2, 24, 24));
         tab.setBackground(UITheme.COLOR_BG_APP);
@@ -1238,14 +1175,10 @@ public class GacoanApp extends JFrame {
                 riwayatPanggilan.add(trans);
 
                 new Thread(() -> {
-                    if (PreFlightCheck.runCheck().dllOk) {
-                        try {
-                            SistemNotifikasi.panggilAntrean(trans.getNomorMeja());
-                        } catch (Exception ex) {
-                            System.err.println("[TTS Exception] " + ex.getMessage());
-                        }
-                    } else {
-                        System.out.println("[Fallback TTS] Panggilan Meja " + trans.getNomorMeja() + " terpantau.");
+                    try {
+                        SistemNotifikasi.panggilAntrean(trans.getNomorMeja());
+                    } catch (Exception ex) {
+                        System.err.println("[Notification Exception] " + ex.getMessage());
                     }
                 }).start();
 
@@ -1264,14 +1197,10 @@ public class GacoanApp extends JFrame {
             btnRecall.setPreferredSize(new Dimension(130, 28));
             btnRecall.addActionListener(e -> {
                 new Thread(() -> {
-                    if (PreFlightCheck.runCheck().dllOk) {
-                        try {
-                            SistemNotifikasi.panggilAntrean(trans.getNomorMeja());
-                        } catch (Exception ex) {
-                            System.err.println("[TTS Exception] " + ex.getMessage());
-                        }
-                    } else {
-                        System.out.println("[Fallback TTS Recall] Panggilan Meja " + trans.getNomorMeja() + " terpantau.");
+                    try {
+                        SistemNotifikasi.panggilAntrean(trans.getNomorMeja());
+                    } catch (Exception ex) {
+                        System.err.println("[Notification Exception] " + ex.getMessage());
                     }
                 }).start();
             });
