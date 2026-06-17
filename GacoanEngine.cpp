@@ -1,31 +1,55 @@
 #define INITGUID
 #include <windows.h>
 #include <mmsystem.h>
-#include <sapi.h>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <iomanip>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "gacoan_GacoanEngine.h"
 #include "gacoan_SistemNotifikasi.h"
 
-std::string formatRupiah(double amount) {
-    long long val = (long long)amount;
-    std::string s = std::to_string(val);
-    int n = s.length() - 3;
-    while (n > 0) {
-        s.insert(n, ".");
-        n -= 3;
+static void appendf(char* buffer, size_t capacity, size_t* length, const char* format, ...) {
+    if (*length >= capacity) {
+        return;
     }
-    return "Rp " + s;
+
+    va_list args;
+    va_start(args, format);
+    int written = vsnprintf(buffer + *length, capacity - *length, format, args);
+    va_end(args);
+
+    if (written < 0) {
+        return;
+    }
+
+    if ((size_t)written >= capacity - *length) {
+        *length = capacity - 1;
+        buffer[*length] = '\0';
+    } else {
+        *length += (size_t)written;
+    }
 }
 
-std::string jstringToString(JNIEnv* env, jstring jstr) {
-    if (!jstr) return "";
-    const char* strChars = env->GetStringUTFChars(jstr, NULL);
-    std::string result(strChars);
-    env->ReleaseStringUTFChars(jstr, strChars);
-    return result;
+static void formatRupiah(double amount, char* output, size_t outputSize) {
+    long long value = (long long)amount;
+    char digits[32];
+    snprintf(digits, sizeof(digits), "%lld", value);
+
+    size_t digitLen = strlen(digits);
+    size_t pos = 0;
+    int firstGroup = (int)(digitLen % 3);
+    if (firstGroup == 0) {
+        firstGroup = 3;
+    }
+
+    pos += snprintf(output + pos, outputSize - pos, "Rp ");
+    for (size_t i = 0; i < digitLen && pos + 1 < outputSize; ++i) {
+        if (i > 0 && ((int)i - firstGroup) % 3 == 0) {
+            output[pos++] = '.';
+        }
+        output[pos++] = digits[i];
+    }
+    output[pos] = '\0';
 }
 
 JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobject obj, jobject transaksiObj) {
@@ -34,33 +58,47 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
     }
 
     jclass transClass = env->GetObjectClass(transaksiObj);
-    
+
     jmethodID getIdNotaMid = env->GetMethodID(transClass, "getIdNota", "()Ljava/lang/String;");
     jmethodID getNomorMejaMid = env->GetMethodID(transClass, "getNomorMeja", "()I");
     jmethodID getDaftarBelanjaMid = env->GetMethodID(transClass, "getDaftarBelanja", "()Ljava/util/List;");
-    
+
     jstring idNotaJStr = (jstring)env->CallObjectMethod(transaksiObj, getIdNotaMid);
-    std::string idNota = jstringToString(env, idNotaJStr);
-    
+    const char* idNotaChars = NULL;
+    const char* idNota = "";
+    if (idNotaJStr) {
+        idNotaChars = env->GetStringUTFChars(idNotaJStr, NULL);
+        if (idNotaChars) {
+            idNota = idNotaChars;
+        }
+    }
+
     jint nomorMeja = env->CallIntMethod(transaksiObj, getNomorMejaMid);
-    
+
     jobject listObj = env->CallObjectMethod(transaksiObj, getDaftarBelanjaMid);
     if (!listObj) {
+        if (idNotaChars) env->ReleaseStringUTFChars(idNotaJStr, idNotaChars);
+        if (idNotaJStr) env->DeleteLocalRef(idNotaJStr);
+        env->DeleteLocalRef(transClass);
         return env->NewStringUTF("Error: Daftar belanja null");
     }
 
     jclass listClass = env->GetObjectClass(listObj);
     jmethodID sizeMid = env->GetMethodID(listClass, "size", "()I");
     jmethodID getMid = env->GetMethodID(listClass, "get", "(I)Ljava/lang/Object;");
-    
+
     jint listSize = env->CallIntMethod(listObj, sizeMid);
-    
+
     double subtotal = 0;
-    std::stringstream itemDetails;
+    char itemDetails[24576];
+    size_t itemLen = 0;
+    itemDetails[0] = '\0';
 
     for (int i = 0; i < listSize; ++i) {
         jobject itemObj = env->CallObjectMethod(listObj, getMid, i);
-        if (!itemObj) continue;
+        if (!itemObj) {
+            continue;
+        }
 
         jclass itemClass = env->GetObjectClass(itemObj);
         jmethodID getMenuMid = env->GetMethodID(itemClass, "getMenu", "()Lgacoan/Menu;");
@@ -71,10 +109,9 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
         jobject menuObj = env->CallObjectMethod(itemObj, getMenuMid);
         jint qty = env->CallIntMethod(itemObj, getQtyMid);
         jint lvl = env->CallIntMethod(itemObj, getLvlMid);
-        jstring catJStr = (jstring)env->CallObjectMethod(itemObj, getCatatanMid);
-        std::string catatan = jstringToString(env, catJStr);
 
         if (!menuObj) {
+            env->DeleteLocalRef(itemClass);
             env->DeleteLocalRef(itemObj);
             continue;
         }
@@ -85,46 +122,61 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
         jmethodID getMenuKategoriMid = env->GetMethodID(menuClass, "getKategori", "()Ljava/lang/String;");
 
         jstring namaJStr = (jstring)env->CallObjectMethod(menuObj, getMenuNamaMid);
-        std::string nama = jstringToString(env, namaJStr);
-        double hargaDasar = env->CallDoubleMethod(menuObj, getMenuHargaMid);
         jstring katJStr = (jstring)env->CallObjectMethod(menuObj, getMenuKategoriMid);
-        std::string kategori = jstringToString(env, katJStr);
+        jstring catJStr = (jstring)env->CallObjectMethod(itemObj, getCatatanMid);
 
+        const char* namaChars = namaJStr ? env->GetStringUTFChars(namaJStr, NULL) : NULL;
+        const char* kategoriChars = katJStr ? env->GetStringUTFChars(katJStr, NULL) : NULL;
+        const char* catatanChars = catJStr ? env->GetStringUTFChars(catJStr, NULL) : NULL;
+
+        const char* nama = namaChars ? namaChars : "";
+        const char* kategori = kategoriChars ? kategoriChars : "";
+        const char* catatan = catatanChars ? catatanChars : "";
+
+        double hargaDasar = env->CallDoubleMethod(menuObj, getMenuHargaMid);
         double calculatedPrice = hargaDasar;
-        if (kategori == "Makanan") {
-            if (lvl >= 1 && lvl <= 4) {
-                calculatedPrice = 11000;
-            } else if (lvl >= 5 && lvl <= 8) {
+
+        if (strcmp(kategori, "Makanan") == 0) {
+            if (lvl >= 5 && lvl <= 8) {
                 calculatedPrice = 13000;
-            } else if (lvl == 0) {
+            } else {
                 calculatedPrice = 11000;
             }
-        } else if (kategori == "Dimsum") {
+        } else if (strcmp(kategori, "Dimsum") == 0) {
             calculatedPrice = 10000;
-        } else if (kategori == "Minuman") {
+        } else if (strcmp(kategori, "Minuman") == 0) {
             calculatedPrice = 9000;
         }
 
         double itemSubtotal = qty * calculatedPrice;
         subtotal += itemSubtotal;
 
-        itemDetails << " " << nama;
-        if (kategori == "Makanan") {
-            itemDetails << " (Lvl " << lvl << ")";
-        }
-        itemDetails << "\n";
-        itemDetails << "   " << qty << " x " << formatRupiah(calculatedPrice) 
-                    << "                      " << formatRupiah(itemSubtotal) << "\n";
-        if (!catatan.empty()) {
-            itemDetails << "   *Catatan: " << catatan << "\n";
-        }
-        itemDetails << "\n";
+        char priceText[64];
+        char itemSubtotalText[64];
+        formatRupiah(calculatedPrice, priceText, sizeof(priceText));
+        formatRupiah(itemSubtotal, itemSubtotalText, sizeof(itemSubtotalText));
 
-        env->DeleteLocalRef(namaJStr);
-        env->DeleteLocalRef(katJStr);
+        appendf(itemDetails, sizeof(itemDetails), &itemLen, " %s", nama);
+        if (strcmp(kategori, "Makanan") == 0) {
+            appendf(itemDetails, sizeof(itemDetails), &itemLen, " (Lvl %d)", (int)lvl);
+        }
+        appendf(itemDetails, sizeof(itemDetails), &itemLen, "\n");
+        appendf(itemDetails, sizeof(itemDetails), &itemLen,
+                "   %d x %s                      %s\n", (int)qty, priceText, itemSubtotalText);
+        if (catatan[0] != '\0') {
+            appendf(itemDetails, sizeof(itemDetails), &itemLen, "   *Catatan: %s\n", catatan);
+        }
+        appendf(itemDetails, sizeof(itemDetails), &itemLen, "\n");
+
+        if (namaChars) env->ReleaseStringUTFChars(namaJStr, namaChars);
+        if (kategoriChars) env->ReleaseStringUTFChars(katJStr, kategoriChars);
+        if (catatanChars) env->ReleaseStringUTFChars(catJStr, catatanChars);
+
+        if (namaJStr) env->DeleteLocalRef(namaJStr);
+        if (katJStr) env->DeleteLocalRef(katJStr);
+        if (catJStr) env->DeleteLocalRef(catJStr);
         env->DeleteLocalRef(menuClass);
         env->DeleteLocalRef(menuObj);
-        env->DeleteLocalRef(catJStr);
         env->DeleteLocalRef(itemClass);
         env->DeleteLocalRef(itemObj);
     }
@@ -132,59 +184,65 @@ JNIEXPORT jstring JNICALL Java_gacoan_GacoanEngine_hitungNota(JNIEnv *env, jobje
     double pb1 = subtotal * 0.10;
     double totalAkhir = subtotal + pb1;
 
-    std::stringstream receipt;
-    receipt << "================================================\n";
-    receipt << "                  MIE GACOAN                    \n";
-    receipt << "           SISTEM PEMESANAN MANDIRI             \n";
-    receipt << "================================================\n";
-    receipt << " ID NOTA : " << idNota << "\n";
-    receipt << " MEJA    : " << nomorMeja << "\n";
-    receipt << "------------------------------------------------\n";
-    receipt << itemDetails.str();
-    receipt << "------------------------------------------------\n";
-    receipt << " Subtotal            :        " << formatRupiah(subtotal) << "\n";
-    receipt << " Pajak Resto (PB1 10%):       " << formatRupiah(pb1) << "\n";
-    receipt << " Biaya Layanan       :        Rp 0\n";
-    receipt << "------------------------------------------------\n";
-    receipt << " TOTAL AKHIR         :        " << formatRupiah(totalAkhir) << "\n";
-    receipt << "================================================\n";
-    receipt << "      Terima kasih atas pesanan Anda!           \n";
-    receipt << "  Silakan monitor KDS dapur untuk pengambilan.  \n";
-    receipt << "================================================\n";
+    char subtotalText[64];
+    char pb1Text[64];
+    char totalText[64];
+    formatRupiah(subtotal, subtotalText, sizeof(subtotalText));
+    formatRupiah(pb1, pb1Text, sizeof(pb1Text));
+    formatRupiah(totalAkhir, totalText, sizeof(totalText));
 
+    char receipt[32768];
+    size_t receiptLen = 0;
+    receipt[0] = '\0';
+
+    appendf(receipt, sizeof(receipt), &receiptLen, "================================================\n");
+    appendf(receipt, sizeof(receipt), &receiptLen, "                  MIE GACOAN                    \n");
+    appendf(receipt, sizeof(receipt), &receiptLen, "           SISTEM PEMESANAN MANDIRI             \n");
+    appendf(receipt, sizeof(receipt), &receiptLen, "================================================\n");
+    appendf(receipt, sizeof(receipt), &receiptLen, " ID NOTA : %s\n", idNota);
+    appendf(receipt, sizeof(receipt), &receiptLen, " MEJA    : %d\n", (int)nomorMeja);
+    appendf(receipt, sizeof(receipt), &receiptLen, "------------------------------------------------\n");
+    appendf(receipt, sizeof(receipt), &receiptLen, "%s", itemDetails);
+    appendf(receipt, sizeof(receipt), &receiptLen, "------------------------------------------------\n");
+    appendf(receipt, sizeof(receipt), &receiptLen, " Subtotal            :        %s\n", subtotalText);
+    appendf(receipt, sizeof(receipt), &receiptLen, " Pajak Resto (PB1 10%%):       %s\n", pb1Text);
+    appendf(receipt, sizeof(receipt), &receiptLen, " Biaya Layanan       :        Rp 0\n");
+    appendf(receipt, sizeof(receipt), &receiptLen, "------------------------------------------------\n");
+    appendf(receipt, sizeof(receipt), &receiptLen, " TOTAL AKHIR         :        %s\n", totalText);
+    appendf(receipt, sizeof(receipt), &receiptLen, "================================================\n");
+    appendf(receipt, sizeof(receipt), &receiptLen, "      Terima kasih atas pesanan Anda!           \n");
+    appendf(receipt, sizeof(receipt), &receiptLen, "  Silakan monitor KDS dapur untuk pengambilan.  \n");
+    appendf(receipt, sizeof(receipt), &receiptLen, "================================================\n");
+
+    if (idNotaChars) env->ReleaseStringUTFChars(idNotaJStr, idNotaChars);
+    if (idNotaJStr) env->DeleteLocalRef(idNotaJStr);
     env->DeleteLocalRef(listClass);
     env->DeleteLocalRef(listObj);
     env->DeleteLocalRef(transClass);
-    env->DeleteLocalRef(idNotaJStr);
 
-    return env->NewStringUTF(receipt.str().c_str());
+    return env->NewStringUTF(receipt);
 }
 
 JNIEXPORT void JNICALL Java_gacoan_SistemNotifikasi_panggilAntrean(JNIEnv *env, jclass clazz, jint nomorMeja) {
-    std::wstring wavPath = L"audio/meja_" + std::to_wstring(nomorMeja) + L".wav";
-    DWORD attrib = GetFileAttributesW(wavPath.c_str());
+    wchar_t wavPath[MAX_PATH];
+    swprintf(wavPath, MAX_PATH, L"audio/meja_%d.wav", (int)nomorMeja);
+
+    DWORD attrib = GetFileAttributesW(wavPath);
     if (attrib != INVALID_FILE_ATTRIBUTES && !(attrib & FILE_ATTRIBUTE_DIRECTORY)) {
-        PlaySoundW(wavPath.c_str(), NULL, SND_FILENAME | SND_SYNC);
+        PlaySoundW(wavPath, NULL, SND_FILENAME | SND_SYNC);
         return;
     }
 
-    ISpVoice * pVoice = NULL;
+    char command[512];
+    snprintf(command, sizeof(command),
+             "powershell -NoProfile -ExecutionPolicy Bypass -Command \""
+             "Add-Type -AssemblyName System.Speech; "
+             "$speak = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+             "$speak.Speak('Pesanan untuk meja nomor %d, silakan ambil.');\"",
+             (int)nomorMeja);
 
-    if (FAILED(::CoInitialize(NULL))) {
-        std::cerr << "[JNI-TTS] Failed to initialize COM" << std::endl;
-        return;
+    int exitCode = system(command);
+    if (exitCode != 0) {
+        OutputDebugStringA("[JNI-TTS] PowerShell TTS failed.\n");
     }
-
-    HRESULT hr = CoCreateInstance(CLSID_SpVoice, NULL, CLSCTX_ALL, IID_ISpVoice, (void **)&pVoice);
-    if (SUCCEEDED(hr)) {
-        std::wstring text = L"Pesanan untuk meja nomor " + std::to_wstring(nomorMeja) + L", silakan ambil.";
-        
-        pVoice->Speak(text.c_str(), 0, NULL);
-        pVoice->Release();
-        pVoice = NULL;
-    } else {
-        std::cerr << "[JNI-TTS] Failed to create SpVoice instance: " << hr << std::endl;
-    }
-
-    ::CoUninitialize();
 }

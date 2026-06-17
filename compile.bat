@@ -1,4 +1,5 @@
 @echo off
+setlocal EnableExtensions EnableDelayedExpansion
 echo =========================================================
 echo       MIE GACOAN JNI COMPILER ^& BUILD SYSTEM (WIN64)
 echo =========================================================
@@ -13,9 +14,18 @@ if not exist bin (
 REM 2. Check for JAVA_HOME env variable
 if "%JAVA_HOME%"=="" (
     echo [!] WARNING: JAVA_HOME environment variable is not defined!
-    echo Attempting to fallback to standard JDK 25 path...
-    set "JAVA_HOME=C:\Program Files\Java\jdk-25.0.2"
+    echo Attempting to detect JDK from javac on PATH...
+    for /f "delims=" %%J in ('where javac 2^>nul') do (
+        set "JAVA_HOME=%%~dpJ.."
+        goto :JAVA_HOME_FOUND
+    )
+    echo [X] ERROR: javac was not found on PATH. Please install JDK or set JAVA_HOME.
+    pause
+    exit /b 1
 )
+
+:JAVA_HOME_FOUND
+for %%D in ("%JAVA_HOME%") do set "JAVA_HOME=%%~fD"
 
 echo [*] Using JDK from: %JAVA_HOME%
 
@@ -31,7 +41,30 @@ echo [✓] Java classes compiled successfully.
 
 REM 4. Compile C++ GacoanEngine.dll
 echo [*] [2/3] Compiling C++ JNI Dynamic Library (GacoanEngine.dll)...
-g++ -shared -O2 -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -I. GacoanEngine.cpp -o bin/GacoanEngine.dll -lole32 -loleaut32 -luuid -lwinmm
+set "CPP_COMPILER=C:\Program Files (x86)\Dev-Cpp\MinGW64\bin\g++.exe"
+
+if not exist "!CPP_COMPILER!" (
+    echo [X] ERROR: 64-bit C++ compiler not found at:
+    echo     !CPP_COMPILER!
+    pause
+    exit /b 1
+)
+
+echo [*] Using C++ compiler: !CPP_COMPILER!
+echo [*] Compiler target machine:
+"!CPP_COMPILER!" -dumpmachine
+if %ERRORLEVEL% neq 0 (
+    echo [X] ERROR: Failed to run compiler dumpmachine check.
+    pause
+    exit /b %ERRORLEVEL%
+)
+
+if exist bin\GacoanEngine.dll (
+    echo [*] Removing old bin\GacoanEngine.dll...
+    del /f /q bin\GacoanEngine.dll
+)
+
+"C:\Program Files (x86)\Dev-Cpp\MinGW64\bin\g++.exe" -std=c++11 -shared -O2 -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -I. GacoanEngine.cpp -o bin\GacoanEngine.dll -lole32 -loleaut32 -luuid -lwinmm
 if %ERRORLEVEL% neq 0 (
     echo [X] ERROR: C++ Compilation failed!
     pause
